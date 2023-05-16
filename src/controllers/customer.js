@@ -23,13 +23,14 @@ module.exports = {
 
     }
   },
-  singup:async (body) =>{
+  singup:async(body) =>{
+    return new Promise(async (resolve, reject) => {
       try {
         const filter = { phone_no: body.phone_no };
         const update = { $set: { name: body?.name } };
         const options = { upsert: true };
         await Customer.updateOne(filter, update, options);
-        resolve("Customer Upsert")
+        resolve("Customer Created")
       }
       catch (error) {
         return res.status(400).send({
@@ -39,6 +40,8 @@ module.exports = {
         })
 
       }
+    })
+
   }
 }
 

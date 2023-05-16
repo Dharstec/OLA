@@ -9,6 +9,7 @@ module.exports = {
                 const update = { $set: { otp: otp } }; 
                 const options = { upsert: true }; 
                 const result = await OTPTable.updateOne(filter, update,options);
+                console.log(result)
                 resolve("success")
             }
             catch (error) {

@@ -16,7 +16,6 @@ const driver = new mongoose.Schema(
         bank_account_details: String,
         driving_licence_no:String,
         driving_licence_img: String,
-        profile_picture_no:String,
         profile_picture_img: String,
         aadhar_card_no:String,
         aadhar_card_img: String,

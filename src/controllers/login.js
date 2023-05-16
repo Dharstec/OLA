@@ -1,7 +1,7 @@
 
 const twilio = require('twilio');
 const accountSid = 'AC71d7398f42377b4797486bc2ab50a98b';
-const authToken = '7912cc35b23c005f5ffa0e65f84aea6f';
+const authToken = 'a54a057a8379a46f6df6e4f498218efc';
 const config = require("../config/authConfig");
 var jwt = require("jsonwebtoken");
 
@@ -25,20 +25,19 @@ module.exports = {
     custoemrlogin: async (req, res) => {
         try {
             const phone = req.body.phone_no;
-            const type = "Customer"
             if (req.body.hasOwnProperty('otp')) {
                 const otp = req.body.otp;
                 let otpres = await otpController.getOTP(phone)
                 if (otp === otpres?.otp) {
                     let singn = await customerController.singup(req.body)
                     console.log(singn)
-                    var token = jwt.sign({ phone_no: phone, flag: type }, config.secret, {
+                    var token = jwt.sign({ phone_no: phone, flag: "Customer" }, config.secret, {
                         expiresIn: 86400 // 24 hours
                     });
                     return res.status(200).send({
                         status: true,
                         phone_no: phone,
-                        type: type,
+                        type: "Customer",
                         accessToken: token
                     });
                 } else {
