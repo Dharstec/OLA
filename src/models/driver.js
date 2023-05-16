@@ -4,8 +4,7 @@ const driver = new mongoose.Schema(
         language: String,
         phone_no: {
             type: Number,
-            required: [true, "Please enter your phone_no"],
-            unique: true
+            required: [true, "Please enter your phone_no"]
         },
         email: String,
         name: String,

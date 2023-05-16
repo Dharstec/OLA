@@ -23,7 +23,7 @@ module.exports = {
 
     }
   },
-  singup:async(body) =>{
+  singup: async (body) => {
     return new Promise(async (resolve, reject) => {
       try {
         const filter = { phone_no: body.phone_no };
@@ -42,6 +42,22 @@ module.exports = {
       }
     })
 
+  },
+  getProfile: async (req, res) => {
+    console.log(req.phone_no)
+    try {
+      let datas = await Customer.find({ phone_no: req.phone_no })
+      res.status(200).send({
+        message: "Success",
+        data: datas
+      })
+
+    } catch (error) {
+      res.status(500).send({
+        message: "Failed",
+        data: `${error.message || error}`
+      })
+    }
   }
 }
 

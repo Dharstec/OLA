@@ -1,4 +1,5 @@
 const driver = require("../controllers/driver");
+const { verifyToken } = require("../middleware/auth.js");
 const router = require('express').Router();
 const multer = require('multer');
 
@@ -24,13 +25,16 @@ const uploadData = multer({
   fileFilter: multerFilter,
 });
 
-router.post("/profile", uploadData.fields([
-  { name: 'aadhaar_img' },
-  { name: 'pancard_img' },
-  { name: 'rc_book_img' },
-  { name: 'profile_picture_img' },
-  { name: 'driving_licence_img' },
-  { name: 'vehicel_insurance_img' }
-]), driver.singupMobile);
+router.post("/profile", 
+uploadData.fields([
+  { name: 'aadhaar', maxCount: 1 },
+  { name: 'pancard', maxCount: 1 },
+  { name: 'profile_picture', maxCount: 1 },
+  { name: 'rc_book', maxCount: 1 },
+  { name: 'driving_licence', maxCount: 1 },
+  { name: 'vehicel_insurance', maxCount: 1 }
+]),verifyToken, 
+driver.singupMobile);
+router.get("/profile",verifyToken,driver.getProfile);
 
 module.exports = router

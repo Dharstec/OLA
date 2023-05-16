@@ -19,7 +19,7 @@ const sendVerificationCode = (phone, code) => {
         });
 }
 
-const verificationCode = Math.floor(1000 + Math.random() * 9000);
+const verificationCode = Math.floor(100000 + Math.random() * 900000)
 
 module.exports = {
     custoemrlogin: async (req, res) => {
@@ -78,20 +78,20 @@ module.exports = {
     driverLogin: async (req, res) => {
         try {
             const phone = req.body.phone_no;
-            const type = "Driver"
             if (req.body.hasOwnProperty('otp')) {
-                const otp = req.body.otp;
+                const otp = req?.body?.otp;
                 let otpres = await otpController.getOTP(phone)
+                console.log(otpres?.otp)
                 if (otp === otpres?.otp) {
                     let singn = await driverController.singup(req.body)
                     console.log(singn)
-                    var token = jwt.sign({ phone_no: phone, flag: type }, config.secret, {
+                    var token = jwt.sign({ phone_no: phone, flag: "Driver" }, config.secret, {
                         expiresIn: 86400 // 24 hours
                     });
                     return res.status(200).send({
                         status: true,
                         phone_no: phone,
-                        type: type,
+                        type: "Driver",
                         accessToken: token
                     });
                 } else {
