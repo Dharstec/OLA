@@ -1,7 +1,7 @@
 
 const twilio = require('twilio');
-const accountSid = 'AC71d7398f42377b4797486bc2ab50a98b';
-const authToken = 'a54a057a8379a46f6df6e4f498218efc';
+const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
+const authToken = '9b171b66cc45794674febc0c2c54d957';
 const config = require("../config/authConfig");
 var jwt = require("jsonwebtoken");
 
@@ -14,7 +14,7 @@ const sendVerificationCode = (phone, code) => {
     return client.messages
         .create({
             body: `Your verification code is ${code}`,
-            from: '+12705181163',
+            from: '+12542562304',
             to: phone
         });
 }
