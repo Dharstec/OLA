@@ -1,7 +1,7 @@
 
 const twilio = require('twilio');
 const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
-const authToken = '9b171b66cc45794674febc0c2c54d957';
+const authToken = 'a5b621e9e45ffc06398972417b34a95a';
 const config = require("../config/authConfig");
 var jwt = require("jsonwebtoken");
 
