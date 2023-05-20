@@ -9,7 +9,8 @@ const otp = new mongoose.Schema(
             type: String,
             required: [true, "Please enter your otp"],
         }
-    }
+    },
+    { timestamps: true }
 );
 
 module.exports = mongoose.model("otp", otp);

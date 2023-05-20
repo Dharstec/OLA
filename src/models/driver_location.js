@@ -1,8 +1,22 @@
 const mongoose = require("mongoose");
-const otp = new mongoose.Schema(
+const driver_location = new mongoose.Schema(
     {
-        location : { type: "Point", coordinates: [ -76.703347, 30.710459 ] },
-    }
+        location: {
+            type: {
+                type: String,
+                enum: ['Point']
+            },
+            coordinates: {
+                type: [Number],
+                required: true
+            }
+
+        },
+        phone_no: Number,
+        status:Boolean
+    },
+    { timestamps: true }
+
 );
 
-module.exports = mongoose.model("otp", otp);
+module.exports = mongoose.model("driver_location", driver_location);
