@@ -1,5 +1,7 @@
 
-const Location = require("../models/driver_location")
+const Ride_Create = require("../models/ride_create")
+const Ride_Trans = require("../models/ride_transaction")
+
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -46,24 +48,52 @@ module.exports = {
 
         }
     },
-    // getLocation: async (req, res) => {
-    //     try {
-    //         let response = await Location.find();
-    //         return res.status(200).send({
-    //             message: "Success",
-    //             status: true,
-    //             data: response
-    //         })
-    //     }
-    //     catch (error) {
-    //         return res.status(400).send({
-    //             message: "Error",
-    //             status: false,
-    //             data: error
-    //         })
+    ride_create: async (req, res) => {
+        try {
+            let ride_cr = new Ride_Create({
+                from: req.body.from,
+                to: req.body.to,
+                customer_name: req.body.customer_name,
+                customer_no: req.body.customer_no,
+                driver_no: req.body.driver_no,
+                vechile_no: req.body.vechile_no,
+                vechile_type: req.body.vechile_type,
+                distance: req.body.distance,
+                price: req.body.price,
+                ride_status: "Waiting"
+            });
+            let ride_trans = new Ride_Trans({
+                from: req.body.from,
+                to: req.body.to,
+                customer_name: req.body.customer_name,
+                customer_no: req.body.customer_no,
+                driver_no: req.body.driver_no,
+                vechile_no: req.body.vechile_no,
+                vechile_type: req.body.vechile_type,
+                distance: req.body.distance,
+                price: req.body.price,
+                ride_status: "Waiting"
+            });
+            let response = await ride_cr.save();
+            ride_trans.save();
+            // console.log("createCoupon", createCoupon);
+            return res.status(200).send({
+                message: "Ride Created",
+                status: true,
+                data: response
+            })
+        }
+        catch (error) {
+            return res.status(400).send({
+                message: "Error",
+                status: false,
+                data: error
+            })
 
-    //     }
-    // }
+        }
+    },
+    
+
 }
 
 
