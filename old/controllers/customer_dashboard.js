@@ -1,9 +1,6 @@
 
 const Ride_Create = require("../models/ride_create")
 const Ride_Trans = require("../models/ride_transaction")
-const Location = require("../models/driver_location")
-const assign_driver = require("../controllers/driver")
-
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
@@ -22,15 +19,6 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
-
-function raid_detail(item) {
-    loc = {
-        driver_lat: item.location.coordinates[0],
-        driver_lon: item.location.coordinates[1]
-    }
-
-    return loc
-  }
 module.exports = {
     getditance: async (req, res) => {
         try {
@@ -60,54 +48,6 @@ module.exports = {
 
         }
     },
-
-    get_driver: async (req, res) =>{
-      try{
-       // console.log(req.query)
-       r_id = req.body.raid_id
-        let ride = await Ride_Create.findOne({id: r_id})
-        let raid_detail = {
-            from_ride: ride.from.coordinates[0],
-            to_ride: ride.from.coordinates[1]
-        }
-        //console.log(ride)
-        driver_list = [];
-        let response = await Location.find();
-        for (let i = 0; i < response.length; i++) { 
-            driver_loc = {
-                driv_lat : response[i].location.coordinates[0],
-                driv_lon : response[i].location.coordinates[1]
-            }
-            let distance = getDistanceFromLatLonInKm(driver_loc.driv_lat, driver_loc.driv_lon, raid_detail.from_ride, raid_detail.to_ride)
-            //console.log(distance)
-            driver_list.push({driver_detail: response[i], distance: distance})
-          }
-          //console.log(Math.min(...driver_list))
-         // var min = Math.min(...driver_list.map(item => item.cost));
-           aa = driver_list.map(a => a.distance);
-           min = Math.min(...aa)
-           index = aa.indexOf(min)
-        //   console.log(index)
-          resp = driver_list[index]
-          det = {
-            driver: resp,
-            ride: ride
-          }
-          await assign_driver.rideDetail(det)
-          console.log(det.driver.driver_detail.phone_no)
-          updata = await ride.update({driver_no: det.driver.driver_detail.phone_no, ride_status: "Driver Allocated"})
-        res.send(resp);
-      }
-      catch (error) {
-        return res.status(400).send({
-            message: "Error",
-            status: false,
-            data: error
-        })
-
-    }
-    },
-
     ride_create: async (req, res) => {
         try {
             let ride_cr = new Ride_Create({

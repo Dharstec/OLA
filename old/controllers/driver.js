@@ -1,31 +1,5 @@
-const twilio = require('twilio');
-const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
-const authToken = 'a5b621e9e45ffc06398972417b34a95a';
-const config = require("../config/authConfig");
-const client = twilio(accountSid, authToken);
-const Ride_Create = require("../models/ride_create")
 
 const Driver = require("../models/driver")
-
-const verificationCode = Math.floor(100000 + Math.random() * 900000)
-const rideSendtoDriver = (phone, code) => {
-  return client.messages
-      .create({
-          body: `You Have a Ride`,
-          from: '+12542562304',
-          to: phone
-      });
-}
-
-const  rideAllocationmsgForCustomer = (phone, code) => {
-  return client.messages
-      .create({
-          body: `Driver Alocated`,
-          from: '+12542562304',
-          to: phone
-      });
-}
-
 
 module.exports = {
   singup: async (body) => {
@@ -117,32 +91,6 @@ module.exports = {
         data: `${error.message || error}`
       })
     }
-  },
-
-  rideDetail: async (req, res) => {
-    //console.log("MANI")
-    code = verificationCode
-    //console.log(req.driver.driver_detail.phone_no);
-    sympl = "+"
-    dph = req.driver.driver_detail.phone_no
-    dphon = sympl.concat(dph);
-    //await rideSendtoDriver(dphon, code)
-    cph = req.ride.customer_no
-    cphon = sympl.concat(cph);
-    //await rideAllocationmsgForCustomer(cphon,code)
-    return true
-  },
-
-  driver_response: async(req, res) => {
-    r_id = req.body.raid_id
-    let ride = await Ride_Create.findOne({id: r_id})
-    res_data = await ride.update({ride_status: req.body.status})
-    res.send(ride)
-  },
-
-  currentRide: async(req, res) => {
-    curr_tide = await Ride_Create.find({driver_no: req.phone_no })
-   res.send(curr_tide)
   }
 }
 
