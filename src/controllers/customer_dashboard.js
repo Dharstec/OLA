@@ -3,6 +3,9 @@ const Ride_Create = require("../models/ride_create")
 const Ride_Trans = require("../models/ride_transaction")
 const Location = require("../models/driver_location")
 const assign_driver = require("../controllers/driver")
+const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+
+console.log(randomNumber);
 
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -63,7 +66,7 @@ module.exports = {
 
     get_driver: async (req, res) =>{
       try{
-       // console.log(req.query)
+        console.log(req)
        r_id = req.body.raid_id
         let ride = await Ride_Create.findOne({id: r_id})
         let raid_detail = {
@@ -96,7 +99,25 @@ module.exports = {
           await assign_driver.rideDetail(det)
           console.log(det.driver.driver_detail.phone_no)
           updata = await ride.update({driver_no: det.driver.driver_detail.phone_no, ride_status: "Driver Allocated"})
-        res.send(resp);
+          
+          let ride_trans = new Ride_Trans({
+            from: ride.from,
+            to: ride.to,
+            customer_name: ride.customer_name,
+            customer_no: ride.customer_no,
+            driver_no: det.driver.driver_detail.phone_no,
+            vechile_no: ride.vechile_no,
+            vechile_type: ride.vechile_type,
+            distance: ride.distance,
+            approximate_price: ride.price,
+            price: ride.price,
+            ride_status: "Driver Allocated",
+            paymentmode: ride.paymentmode,
+            ride_id: ride.id
+        });
+          console.log(ride_trans);
+           await ride_trans.save()
+          res.send(resp);
       }
       catch (error) {
         return res.status(400).send({
@@ -110,39 +131,68 @@ module.exports = {
 
     ride_create: async (req, res) => {
         try {
-            let ride_cr = new Ride_Create({
-                from: req.body.from,
-                to: req.body.to,
-                customer_name: req.body.customer_name,
-                customer_no: req.body.customer_no,
-                driver_no: req.body.driver_no,
-                vechile_no: req.body.vechile_no,
-                vechile_type: req.body.vechile_type,
-                distance: req.body.distance,
-                price: req.body.price,
-                ride_status: "Waiting"
-            });
-            let ride_trans = new Ride_Trans({
-                from: req.body.from,
-                to: req.body.to,
-                customer_name: req.body.customer_name,
-                customer_no: req.body.customer_no,
-                driver_no: req.body.driver_no,
-                vechile_no: req.body.vechile_no,
-                vechile_type: req.body.vechile_type,
-                distance: req.body.distance,
-                price: req.body.price,
-                ride_status: "Waiting"
-            });
-            let response = await ride_cr.save();
-            ride_trans.save();
-            // console.log("createCoupon", createCoupon);
-            return res.status(200).send({
-                message: "Ride Created",
-                status: true,
-                data: response
-            })
-        }
+            num = req.body.customer_no
+            console.log(num)
+            wating_ride = Ride_Create.find({customer_no: num, ride_status: "Waiting"}, async function(err, users) {
+                if (err) {
+                    console.error(err);
+                    return;
+                  }
+                if (users.length > 0){
+                    return res.status(200).send({
+                        message: "Cancel the old Ride",
+                        status: true,
+                        data: []
+                    })
+                }
+                else{
+                    //console.log(randomNumber)
+                    let ride_cr = new Ride_Create({
+                        from: req.body.from,
+                        to: req.body.to,
+                        customer_name: req.body.customer_name,
+                        customer_no: req.body.customer_no,
+                        driver_no: req.body.driver_no,
+                        vechile_no: req.body.vechile_no,
+                        vechile_type: req.body.vechile_type,
+                        distance: req.body.distance,
+                        approximate_price: req.body.price,
+                        price: req.body.price,
+                        ride_status: "Waiting",
+                        paymentmode: req.body.paymentmode,
+                        code: randomNumber
+                    });
+                    let response =  await ride_cr.save();
+
+                    let ride_trans = new Ride_Trans({
+                        from: req.body.from,
+                        to: req.body.to,
+                        customer_name: req.body.customer_name,
+                        customer_no: req.body.customer_no,
+                        driver_no: req.body.driver_no,
+                        vechile_no: req.body.vechile_no,
+                        vechile_type: req.body.vechile_type,
+                        distance: req.body.distance,
+                        approximate_price: req.body.price,
+                        price: req.body.price,
+                        ride_status: "Waiting",
+                        paymentmode: req.body.paymentmode,
+                        ride_id: response.id
+                    });
+                    ride_trans.save();
+
+
+                    console.log(response);
+                    return res.status(200).send({
+                        message: "Ride Created",
+                        status: true,
+                        data: response
+                    })
+        
+                    
+                }
+            }); 
+         }
         catch (error) {
             return res.status(400).send({
                 message: "Error",

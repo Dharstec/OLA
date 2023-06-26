@@ -38,5 +38,8 @@ driver.singupMobile);
 router.get("/profile",verifyToken,driver.getProfile);
 router.post("/driver_res", verifyToken, driver.driver_response)
 router.get("/current_ride", verifyToken, driver.currentRide)
+router.post("/start_driver", verifyToken, driver.startRide)
+router.post("/complete_driver", verifyToken, driver.completRide)
+
 
 module.exports = router

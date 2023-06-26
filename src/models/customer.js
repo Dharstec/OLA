@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const customer = new mongoose.Schema(
     {
         phone_no: {
-            type: Number,
+            type: String,
             required: [true, "Please enter your phone_no"],
             unique: true
         },

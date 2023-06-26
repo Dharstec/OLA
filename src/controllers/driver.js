@@ -1,9 +1,10 @@
 const twilio = require('twilio');
 const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
-const authToken = '5adf587df5736492e74feca48b539c15';
+const authToken = 'a5b621e9e45ffc06398972417b34a95a';
 const config = require("../config/authConfig");
 const client = twilio(accountSid, authToken);
 const Ride_Create = require("../models/ride_create")
+const Ride_Trans = require("../models/ride_transaction")
 
 const Driver = require("../models/driver")
 
@@ -137,12 +138,100 @@ module.exports = {
     r_id = req.body.raid_id
     let ride = await Ride_Create.findOne({id: r_id})
     res_data = await ride.update({ride_status: req.body.status})
+    let ride_trans = new Ride_Trans({
+      from: ride.from,
+      to: ride.to,
+      customer_name: ride.customer_name,
+      customer_no: ride.customer_no,
+      driver_no: ride.driver_no,
+      vechile_no: ride.vechile_no,
+      vechile_type: ride.vechile_type,
+      distance: ride.distance,
+      approximate_price: ride.price,
+      price: ride.price,
+      ride_status: req.body.status,
+      paymentmode: ride.paymentmode,
+      ride_id: ride.id
+  });
+    console.log(ride_trans);
+     await ride_trans.save()
+
     res.send(ride)
   },
 
   currentRide: async(req, res) => {
     curr_tide = await Ride_Create.find({driver_no: req.phone_no })
    res.send(curr_tide)
+  },
+
+  startRide: async(req, res)=>{
+    curr_tide = await Ride_Create.findOne({id: req.body.raid_id })
+    if(curr_tide){
+      console.log(curr_tide.code)
+      console.log(req.body.code)
+      if (curr_tide.code == req.body.code){
+        upda = await curr_tide.update({ride_status: "Ride Starting"})
+        console.log(curr_tide)
+        ride = curr_tide
+        let ride_trans = new Ride_Trans({
+          from: ride.from,
+          to: ride.to,
+          customer_name: ride.customer_name,
+          customer_no: ride.customer_no,
+          driver_no: ride.driver_no,
+          vechile_no: ride.vechile_no,
+          vechile_type: ride.vechile_type,
+          distance: ride.distance,
+          approximate_price: ride.price,
+          price: ride.price,
+          ride_status: "Ride Starting",
+          paymentmode: ride.paymentmode,
+          ride_id: ride.id
+      });
+         await ride_trans.save()
+        res.send("Ok")
+      }
+      else{
+        res.send("Code Wrong")
+      }
+    }
+    else{
+      res.send("Ride Not Avialable")
+    }
+  },
+
+  completRide: async(req, res)=>{
+    curr_tide = await Ride_Create.findOne({id: req.body.raid_id })
+    if(curr_tide){
+      //if (curr_tide.code == req.body.code){
+        upda = await curr_tide.update({ride_status: "Ride Completed", ispayed: true})
+        ride = curr_tide
+        let ride_trans = new Ride_Trans({
+          from: ride.from,
+          to: ride.to,
+          customer_name: ride.customer_name,
+          customer_no: ride.customer_no,
+          driver_no: ride.driver_no,
+          vechile_no: ride.vechile_no,
+          vechile_type: ride.vechile_type,
+          distance: ride.distance,
+          approximate_price: ride.price,
+          price: ride.price,
+          ride_status: "Ride Completed",
+          paymentmode: ride.paymentmode,
+          ride_id: ride.id
+      });
+         await ride_trans.save()
+        res.send("Ok")
+      }
+      // else{
+      //   res.send("Code Wrong")
+      // }
+    //}
+    else{
+      res.send("Ride Not Avialable")
+    }
+    
   }
 }
 

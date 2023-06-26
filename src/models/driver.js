@@ -3,7 +3,7 @@ const driver = new mongoose.Schema(
     {
         language: String,
         phone_no: {
-            type: Number,
+            type: String,
             required: [true, "Please enter your phone_no"]
         },
         email: String,

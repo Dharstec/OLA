@@ -23,13 +23,17 @@ const ride = new mongoose.Schema(
 
         },
         customer_name:String,
-        customer_no: Number,
-        driver_no:Number,
+        customer_no: String,
+        driver_no:String,
         vechile_no:String,
         vechile_type:String,
         ride_status:String,
         distance:String,
-        price:String
+        approximate_price: String,
+        price:String,
+        paymentmode: String,
+        ispayed: Boolean,
+        code: String
     },
     { timestamps: true }
 );
