@@ -3,9 +3,6 @@ const Ride_Create = require("../models/ride_create")
 const Ride_Trans = require("../models/ride_transaction")
 const Location = require("../models/driver_location")
 const assign_driver = require("../controllers/driver")
-const randomNumber = Math.floor(Math.random() * 9000) + 1000;
-
-console.log(randomNumber);
 
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -131,8 +128,8 @@ module.exports = {
 
     ride_create: async (req, res) => {
         try {
+            const randomNumber = Math.floor(Math.random() * 9000) + 1000;
             num = req.body.customer_no
-            console.log(num)
             wating_ride = Ride_Create.find({customer_no: num, ride_status: "Waiting"}, async function(err, users) {
                 if (err) {
                     console.error(err);
