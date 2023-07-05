@@ -5,6 +5,9 @@ const Location = require("../models/driver_location")
 const assign_driver = require("../controllers/driver")
 
 
+//console.log(randomNumber);
+
+
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -73,6 +76,7 @@ module.exports = {
         //console.log(ride)
         driver_list = [];
         let response = await Location.find();
+        console.log(response.length)
         for (let i = 0; i < response.length; i++) { 
             driver_loc = {
                 driv_lat : response[i].location.coordinates[0],
@@ -82,6 +86,7 @@ module.exports = {
             //console.log(distance)
             driver_list.push({driver_detail: response[i], distance: distance})
           }
+          console.log(driver_list)
           //console.log(Math.min(...driver_list))
          // var min = Math.min(...driver_list.map(item => item.cost));
            aa = driver_list.map(a => a.distance);
@@ -127,9 +132,10 @@ module.exports = {
     },
 
     ride_create: async (req, res) => {
+        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
         try {
-            const randomNumber = Math.floor(Math.random() * 9000) + 1000;
             num = req.body.customer_no
+            console.log(num)
             wating_ride = Ride_Create.find({customer_no: num, ride_status: "Waiting"}, async function(err, users) {
                 if (err) {
                     console.error(err);

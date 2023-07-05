@@ -1,4 +1,8 @@
 const twilio = require('twilio');
+// const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
+// const authToken = 'a5b621e9e45ffc06398972417b34a95a';
+// const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
+// const authToken = 'fcbff16220d664cb980a6519bb3a9a03';
 const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
 const authToken = 'fcbff16220d664cb980a6519bb3a9a03';
 const config = require("../config/authConfig");
@@ -127,10 +131,10 @@ module.exports = {
     sympl = "+"
     dph = req.driver.driver_detail.phone_no
     dphon = sympl.concat(dph);
-    //await rideSendtoDriver(dphon, code)
+    await rideSendtoDriver(dphon, code)
     cph = req.ride.customer_no
     cphon = sympl.concat(cph);
-    //await rideAllocationmsgForCustomer(cphon,code)
+    await rideAllocationmsgForCustomer(cphon,code)
     return true
   },
 
@@ -160,7 +164,9 @@ module.exports = {
   },
 
   currentRide: async(req, res) => {
-    curr_tide = await Ride_Create.find({driver_no: req.phone_no })
+    console.log(req.phone_no)
+    var newStr = req.phone_no.replace('+','')
+    curr_tide = await Ride_Create.find({driver_no: newStr, ride_status: ["Waiting","Driver Allocated","Accept By Driver"] })
    res.send(curr_tide)
   },
 

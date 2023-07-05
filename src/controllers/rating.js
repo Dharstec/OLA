@@ -65,7 +65,7 @@ module.exports = {
 
         Rating.aggregate([
            {
-               $match: { rating_for: "Driver", customer_no: a } // Filter based on the category field
+               $match: { rating_for: "Driver", driver_no: a } // Filter based on the category field
              },
            {
              $group: {
