@@ -1,16 +1,71 @@
 const twilio = require('twilio');
-// const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
-// const authToken = 'a5b621e9e45ffc06398972417b34a95a';
-// const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
-// const authToken = 'fcbff16220d664cb980a6519bb3a9a03';
 const accountSid = 'ACffd704d837094070829e396cf42ee3e2';
 const authToken = '7c9c18aa49bd33cff6552ddafe3a7999';
 const config = require("../config/authConfig");
 const client = twilio(accountSid, authToken);
 const Ride_Create = require("../models/ride_create")
 const Ride_Trans = require("../models/ride_transaction")
-
+const Location = require("../models/driver_location")
 const Driver = require("../models/driver")
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      ;
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180)
+}
+
+const reallocate = async (r_id) =>{
+  console.log("MANI")
+  let ride = await Ride_Create.findOne({id: r_id})
+  let less = await Ride_Trans.where({ride_id: r_id})
+  console.log(less.length);
+  let raid_detail = {
+      from_ride: ride.from.coordinates[0],
+      to_ride: ride.from.coordinates[1]
+  }
+  driver_list = [];
+  let response = await Location.find();
+  //console.log(response.length)
+  for (let i = 0; i < response.length; i++) { 
+      driver_loc = {
+          driv_lat : response[i].location.coordinates[0],
+          driv_lon : response[i].location.coordinates[1]
+      }
+      let distance = getDistanceFromLatLonInKm(driver_loc.driv_lat, driver_loc.driv_lon, raid_detail.from_ride, raid_detail.to_ride)
+      //console.log(distance)
+      driver_list.push({driver_detail: response[i], distance: distance})
+    }
+    console.log(driver_list)
+    aa = driver_list.map(a => a.distance);
+    min = Math.min(...aa)
+    index = aa.indexOf(min)
+ //   console.log(index)
+   resp = driver_list[index]
+   det = {
+     driver: resp,
+     ride: ride
+   }
+   code = verificationCode
+   //console.log(req.driver.driver_detail.phone_no);
+   sympl = "+"
+   dph = det.driver.driver_detail.phone_no
+   dphon = sympl.concat(dph);
+   await rideSendtoDriver(dphon, code)
+
+  return true
+}
 
 const verificationCode = Math.floor(100000 + Math.random() * 900000)
 const rideSendtoDriver = (phone, code) => {
@@ -22,10 +77,10 @@ const rideSendtoDriver = (phone, code) => {
       });
 }
 
-const  rideAllocationmsgForCustomer = (phone, code) => {
+const  rideAllocationmsgForCustomer = (phone, code, status) => {
   return client.messages
       .create({
-          body: `Driver Alocated`,
+          body: status,
           from: '+12542562304',
           to: phone
       });
@@ -132,16 +187,22 @@ module.exports = {
     dph = req.driver.driver_detail.phone_no
     dphon = sympl.concat(dph);
     await rideSendtoDriver(dphon, code)
-    cph = req.ride.customer_no
-    cphon = sympl.concat(cph);
-    await rideAllocationmsgForCustomer(cphon,code)
+    // cph = req.ride.customer_no
+    // cphon = sympl.concat(cph);
+    // await rideAllocationmsgForCustomer(cphon,code)
     return true
   },
 
   driver_response: async(req, res) => {
+    sympl = "+"
     r_id = req.body.raid_id
     let ride = await Ride_Create.findOne({id: r_id})
+    if (req.body.status === "Accept By Driver" ){
     res_data = await ride.update({ride_status: req.body.status})
+    cph = ride.customer_no
+    cphon = sympl.concat(cph);
+    await rideAllocationmsgForCustomer(cphon,code, req.body.status)    
+    }
     let ride_trans = new Ride_Trans({
       from: ride.from,
       to: ride.to,
@@ -157,16 +218,18 @@ module.exports = {
       paymentmode: ride.paymentmode,
       ride_id: ride.id
   });
-    console.log(ride_trans);
-     await ride_trans.save()
-
+    await ride_trans.save()
+    if (req.body.status === "Cancelled By Driver" ){
+      console.log("Heyy")
+      tea = await reallocate(ride.id)
+    }
     res.send(ride)
   },
 
   currentRide: async(req, res) => {
     console.log(req.phone_no)
     var newStr = req.phone_no.replace('+','')
-    curr_tide = await Ride_Create.find({driver_no: newStr, ride_status: ["Waiting","Driver Allocated","Accept By Driver"] })
+    curr_tide = await Ride_Create.find({driver_no: newStr, ride_status: ["Waiting","Driver Allocated","Accept By Driver", "Waiting For Driver Response"] })
    res.send(curr_tide)
   },
 

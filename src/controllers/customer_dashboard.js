@@ -100,7 +100,7 @@ module.exports = {
           }
           await assign_driver.rideDetail(det)
           console.log(det.driver.driver_detail.phone_no)
-          updata = await ride.update({driver_no: det.driver.driver_detail.phone_no, ride_status: "Driver Allocated"})
+          updata = await ride.update({driver_no: det.driver.driver_detail.phone_no, ride_status: "Waiting For Driver Response"})
           
           let ride_trans = new Ride_Trans({
             from: ride.from,
@@ -113,7 +113,7 @@ module.exports = {
             distance: ride.distance,
             approximate_price: ride.price,
             price: ride.price,
-            ride_status: "Driver Allocated",
+            ride_status: "Waiting For Driver Response",
             paymentmode: ride.paymentmode,
             ride_id: ride.id
         });
