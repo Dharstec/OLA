@@ -4,6 +4,8 @@ const Login = require("./routes/login");
 const Driver_Location = require("./routes/driver_location");
 const CustomerDashboard = require("./routes/customer_dashboard");
 const Rating = require("./routes/rating")
+const Payment = require("./routes/payment")
+
 
 module.exports = function (app) {
     app.use("/customer", Customer);
@@ -11,5 +13,6 @@ module.exports = function (app) {
     app.use("/location", Driver_Location)
     app.use("/driver", Driver);
     app.use("/rating", Rating )
+    app.use("/payment", Payment);
     app.use("/api", Login);
 };
